@@ -1,3 +1,7 @@
+# configs
+app-cfg.json
+*-secret.json
+
 # Logs
 logs
 *.log
