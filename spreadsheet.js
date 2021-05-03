@@ -14,24 +14,25 @@ async function runPuppeteer(url, index) {
 
   function current(el){
     var txt =el.querySelector('h1').textContent; 
-    searchValue = txt;
+    title = txt;
     var txt2 = el.querySelector('.o-ShowLead__a-Description').textContent;
-    descValue = txt2;
+    desc = txt2;
     // var pos = el.getBoundingClientRect();
-    return {searchValue, descValue}
+    return {title: title && title.trim()||'', logo:'', dplusurl:'', image:'', premdate: '', desc: (desc && desc.trim())||''};
   }
-  let {searchValue, descValue} = await frame.$eval('.showLead', current);
+  let {title, desc} = await frame.$eval('.showLead', current);
 
   await page.screenshot({ path: `./screenshots/${index}-pg.png` });
 
   await browser.close();
-  return {url, title: txt, desc: txt2};
+  return {url, title, logo, desc, dplusurl, image, premdate};
 };
 
 
 
 
 async function setupGoogle(data) {
+  console.log('Setting Up google');
   await doc.useServiceAccountAuth({
     client_email,
     private_key
@@ -42,7 +43,7 @@ async function writeToSheet(data) {
 // console.log(cfg, client_email);
 
 
-// await doc.loadInfo(); // loads document properties and worksheets
+await doc.loadInfo(); // loads document properties and worksheets
 // console.log(doc.title);
 // await doc.updateProperties({ title: 'renamed doc' });
 
