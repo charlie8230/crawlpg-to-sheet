@@ -1,6 +1,7 @@
 # configs
 app-cfg.json
 *-secret.json
+sync-array.js
 
 # Logs
 logs
