@@ -2,6 +2,7 @@
 app-cfg.json
 *-secret.json
 sync-array*
+screenshots
 
 # Logs
 logs
