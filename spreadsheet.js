@@ -5,7 +5,9 @@ const doc = new GoogleSpreadsheet(cfg.sheet);
 var {client_email, private_key} = require('./client-secret.json');
 
 async function runPuppeteer(url, index) {
-  if (!(url && index)) return;
+  console.log('inside', url, index);
+  if (!(url && typeof index != 'undefined')) return;
+  console.log('Puppeteer');
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
   await page.goto(url, {
@@ -18,15 +20,15 @@ async function runPuppeteer(url, index) {
     title = txt;
     var txt2 = el.querySelector('.o-ShowLead__a-Description').textContent;
     desc = txt2;
-    // var pos = el.getBoundingClientRect();
+
     return {title: title && title.trim()||'', logo:'', dplusurl:'', image:'', premdate: '', desc: (desc && desc.trim())||''};
   }
-  let {title, desc} = await frame.$eval('.showLead', current);
+  let results = await frame.$eval('.showLead', current);
 
   await page.screenshot({ path: `./screenshots/${index}-pg.png` });
-
+  console.log('Running puppeteer');
   await browser.close();
-  return {index, url, title, logo, desc, dplusurl, image, premdate};
+  return results;
 };
 
 
@@ -41,12 +43,8 @@ async function setupGoogle(data) {
 }
 
 async function writeToSheet(data) {
-// console.log(cfg, client_email);
 
-
-await doc.loadInfo(); // loads document properties and worksheets
-// console.log(doc.title);
-// await doc.updateProperties({ title: 'renamed doc' });
+  await doc.loadInfo(); // loads document properties and worksheets
 
   const sheet = doc.sheetsByIndex[0]; // or use doc.sheetsById[id] or doc.sheetsByTitle[title]
   if (!data) {
