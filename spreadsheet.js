@@ -5,9 +5,10 @@ const doc = new GoogleSpreadsheet(cfg.sheet);
 var {client_email, private_key} = require('./client-secret.json');
 
 async function runPuppeteer(url, index) {
+  if (!(url && index)) return;
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
-  await page.goto('https://www.discovery.core-qa.sni.hgtv.com/shows/francesco', {
+  await page.goto(url, {
       waitUntil: 'load'
   });
   const frame = page.mainFrame();
@@ -25,7 +26,7 @@ async function runPuppeteer(url, index) {
   await page.screenshot({ path: `./screenshots/${index}-pg.png` });
 
   await browser.close();
-  return {url, title, logo, desc, dplusurl, image, premdate};
+  return {index, url, title, logo, desc, dplusurl, image, premdate};
 };
 
 
