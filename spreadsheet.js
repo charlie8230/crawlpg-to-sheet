@@ -10,22 +10,57 @@ async function runPuppeteer(url, index) {
   console.log('Puppeteer');
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
+  await page.setViewport({
+    width: 1366,
+    height: 768,
+    deviceScaleFactor: 1,
+  });
   await page.goto(url, {
       waitUntil: 'load'
   });
   const frame = page.mainFrame();
 
-  function current(el){
-    var txt =el.querySelector('h1').textContent; 
-    title = txt;
-    var txt2 = el.querySelector('.o-ShowLead__a-Description').textContent;
-    desc = txt2;
 
-    return {title: title && title.trim()||'', logo:'', dplusurl:'', image:'', premdate: '', desc: (desc && desc.trim())||''};
+
+  function current(el){
+    function getBGS(str = ''){
+      var regex = /(?<=\(\')(.*?)(?=\'\))/;
+      var search = regex.exec(str);
+  
+      return search && search.length>0 && search[0];
+    }
+  
+    function $get(el, selector){
+      return el.querySelector(selector)
+    }
+    var txt = $get(el, 'h1'); 
+    title = txt && txt.textContent;
+    // description
+    var $desc =  $get(el, '.o-EntertainmentLead__a-Description');
+    var txt2 = $desc && $desc.textContent;
+    desc = txt2 || '';
+    // Season
+    var $season=  $get(el, '.o-EntertainmentLead__a-SeasonLabel');
+    var seasonTxt = $season.textContent;
+    // $d plus url
+    var $dplusurl = $get(el, '.o-EntertainmentLead__m-WatchWrap a');
+    var dplusURL = $dplusurl && $dplusurl.getAttribute('href');
+    // bg image
+    var $imgBg = $get(el, '.o-EntertainmentLead__m-Body--imageBackground');
+    var bgStyles = $imgBg && $imgBg.getAttribute('style');
+    var bgParse = bgStyles && getBGS(bgStyles);
+    // logo
+    var $logoImg = $get(el, '.o-EntertainmentLead__a-Logo');
+    var logoUrl = $logoImg && $logoImg.getAttribute('src');
+
+    return {title: title && title.trim()||'', logo:logoUrl, dplusurl:dplusURL, image:bgParse, premdate: '', seasons: seasonTxt, desc: (desc && desc.trim())||''};
   }
   let results = await frame.$eval('.showLead', current);
-
+  results.index = index;
+  results.url = url;
+  
   await page.screenshot({ path: `./screenshots/${index}-pg.png` });
+  results.screenshot = `screenshots/${index}-page.png`
   console.log('Running puppeteer');
   await browser.close();
   return results;

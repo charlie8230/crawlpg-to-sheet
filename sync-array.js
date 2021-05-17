@@ -1,7 +1,7 @@
 const fetch = require('node-fetch');
 const { setupGoogle, runPuppeteer, writeToSheet } = require('./spreadsheet');
 async function* getAllPages(){
-    let arr = ['https://www.discovery.com/shows/street-outlaws', 'https://www.discovery.com/shows/gold-rush','https://www.discovery.com/shows/expedition-unknown'];
+    let arr = ['https://www.discovery.stl-08.sni.hgtv.com/shows/street-outlaws', 'https://www.discovery.stl-08.sni.hgtv.com/shows/gold-rush','https://www.discovery.stl-08.sni.hgtv.com/shows/expedition-unknown'];
     
     for (let r=0; r<arr.length; r++) {
         let url = arr[r];
@@ -27,8 +27,8 @@ setupGoogle();
     
     try {
         for await (const it of getAllPages()) {
-            let {index, url, title, logo, desc, dplusurl, image, premdate} = it;
-            await writeToSheet([index, url, title, logo, desc, dplusurl, image, premdate])
+            let {index, url, title, logo, desc, dplusurl, image, seasons, premdate, screenshot} = it;
+            await writeToSheet([index, url, title, logo, desc, seasons, dplusurl, image, premdate, screenshot])
             console.log('awaited', it);
         }
     } catch (err) {
